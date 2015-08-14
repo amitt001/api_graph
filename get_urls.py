@@ -19,4 +19,16 @@ def process_url(url):
         idx = url.split('/').index('survey')+1
         url = '/'.join(url.split('/')[:idx])
 
-    return url
+def process_url_new(url):
+    #url = url.split('::')[3]
+    urls = open('urls', 'r').read().splitlines()
+    urls.sort()
+    url = url.split('?')[0].strip()
+    if url in urls:
+        return urls[urls.index(url)].strip()
+    elif '/'.join(url.split('/')[:-1]) in urls:
+        return urls[urls.index('/'.join(url.split('/')[:-1]))].strip()
+    elif '/'.join(url.split('/')[:-2]) in urls:
+        return urls[urls.index('/'.join(url.split('/')[:-2]))].strip()
+
+    return -1

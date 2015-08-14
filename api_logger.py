@@ -13,10 +13,6 @@ import MySQLdb as mdb
 import get_urls
 import config
 
-"""
-Notes: commit after 1 minute
-"""
-
 
 try:
     con = mdb.connect(config.HOST, config.USER, config.PASSWORD, config.DB_NAME)

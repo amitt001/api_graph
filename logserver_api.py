@@ -48,7 +48,7 @@ def get_logs():
         data = inFile.readline()
         if data[0].isdigit():
             i = data.split('::')
-            rsp_time, rsp, url, date_time = i[0].strip(), i[1].split()[0], get_urls.process_url(i[3]), i[-1].split('.')[0][:-3].strip()
+            rsp_time, rsp, url, date_time = i[0].strip(), i[1].split()[0], get_urls.process_url_new(i[3]), i[-1].split('.')[0][:-3].strip()
 
             if tmp_time == 'null':
                 tmp_time = date_time
