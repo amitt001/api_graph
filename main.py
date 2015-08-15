@@ -28,7 +28,20 @@ except mdb.Error, e:
 @app.route('/')
 def index():
     """ to render figures on html """
-    return render_template('index.html')
+    return """
+    <html><body>
+            <h1>API log performance status visualization</h1>
+                </br>
+            Try:
+                </br>
+            <ul>
+                <li>/user/details/others/</li>
+                <li>/question/list/public/</li>
+                <li>/list/trending/users/</li>
+                <li>/timeline/user/</li>
+            </ul>
+        </body><html>
+    """
 
 @app.route('/user/details/others/')
 def user_details_others():
@@ -67,8 +80,10 @@ def timeline_user():
 def get_pie(par1='', par2='', par3=''):
     url = 'http://api.frankly.me' + '/' + par1 + '/' + par2 + '/' + par3 + '/'
     url = url.strip('/')
-    sql = 'select status, count from %s where DATE_TIME BETWEEN "2015-8-5 13:28" AND "2015-8-5 13:38" and url="%s"' % (config.TABLE_RESPONSE, url)
-    cur.execute(sql)
+    cur.execute(
+        'SELECT status, count FROM %s WHERE DATE_TIME BETWEEN "%s" AND "%s" AND url="%s"' % 
+        (config.TABLE_RESPONSE, config.T1, config.T2, url)
+        )
     data = cur.fetchall()
 
     status_dict = {}
@@ -91,12 +106,14 @@ def get_line(par1='', par2='', par3=''):
 
     url = 'http://api.frankly.me' + '/' + par1 + '/' + par2 + '/' + par3 + '/'
     url = url.strip('/')
-    print url
 
     try:
         data = []
         for status in config.STATUS:
-            cur.execute('select date_time, response_time FROM %s where status=%s and url="%s" and DATE_TIME BETWEEN "2015-8-5 13:28" AND "2015-8-5 13:38" order by date_time desc LIMIT 10' % (config.TABLE_RESPONSE , status, url))
+            cur.execute(
+                'SELECT date_time, response_time FROM %s WHERE status=%s AND url="%s" AND DATE_TIME BETWEEN "%s" AND "%s" ORDER BY date_time DESC LIMIT 10' % 
+                (config.TABLE_RESPONSE , status, url, config.T1, config.T2)
+                )
             data.append(cur.fetchall())
 
     except Exception as e:

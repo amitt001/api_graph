@@ -18,5 +18,9 @@ REDIS_SERVER = "localhost"
 REDIS_PORT = 6379
 REDIS_HNAME = "APIHASH"
 
+#Time Period between which api logs are queried from MySQLDB
+T1 = "2015-8-5 13:28"
+T2 = "2015-8-5 13:38"
+
 #HTTP status codes
 STATUS = ['200', '302', '403', '404', '409', '500', '400']
