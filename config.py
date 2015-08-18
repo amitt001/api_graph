@@ -4,6 +4,7 @@
 
 #Log server API url
 URL = "http://127.0.0.1:8000/get/log/"
+LOG_FILE = "/home/amitt001/mycodes/frankly/graph/api_graph/flask-timelog.txt"
 
 #SQL config
 HOST = "localhost"

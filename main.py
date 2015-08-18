@@ -1,5 +1,6 @@
+#!/usr/bin/env python
+
 import sys
-import pytz
 import json
 import random
 import pprint
@@ -35,8 +36,9 @@ def index():
             Try:
                 </br>
             <ul>
-                <li>/user/details/others/</li>
-                <li>/question/list/public/</li>
+                <li>/api/user/details/others/</li>
+                <li>/api/question/list/public/</li>
+                <li><b>/api</b>/question/list/public/</li>
                 <li>/list/trending/users/</li>
                 <li>/timeline/user/</li>
             </ul>
@@ -49,8 +51,20 @@ def user_details_others():
         src='/get' + request.path, 
         src_pie='/get/pie' + request.path)
 
+@app.route('/api/user/details/others/')
+def api_user_details_others():
+    return render_template('index.html', 
+        src='/get' + request.path, 
+        src_pie='/get/pie' + request.path)
+
 @app.route('/question/list/public/')
 def question_list_public():
+    return render_template('index.html', 
+        src='/get' + request.path, 
+        src_pie='/get/pie' + request.path)
+
+@app.route('/api/question/list/public/')
+def api_question_list_public():
     return render_template('index.html', 
         src='/get' + request.path, 
         src_pie='/get/pie' + request.path)
@@ -61,8 +75,20 @@ def list_trending_users():
         src='/get' + request.path, 
         src_pie='/get/pie' + request.path)
 
+@app.route('/api/list/trending/users/')
+def api_list_trending_users():
+    return render_template('index.html', 
+        src='/get' + request.path, 
+        src_pie='/get/pie' + request.path)
+
 @app.route('/question/view/')
 def question_view():
+    return render_template('index.html', 
+        src='/get' + request.path, 
+        src_pie='/get/pie' + request.path)
+
+@app.route('/api/question/view/')
+def api_question_view():
     return render_template('index.html', 
         src='/get' + request.path, 
         src_pie='/get/pie' + request.path)
@@ -73,12 +99,22 @@ def timeline_user():
         src='/get' + request.path, 
         src_pie='/get/pie' + request.path)
 
+@app.route('/api/timeline/user/')
+def api_timeline_user():
+    return render_template('index.html', 
+        src='/get' + request.path, 
+        src_pie='/get/pie' + request.path)
 
 @app.route('/get/pie/<par1>/')
 @app.route('/get/pie/<par1>/<par2>/')
 @app.route('/get/pie/<par1>/<par2>/<par3>/')
-def get_pie(par1='', par2='', par3=''):
-    url = 'http://api.frankly.me' + '/' + par1 + '/' + par2 + '/' + par3 + '/'
+@app.route('/get/pie/<par1>/<par2>/<par3>/<par4>/')
+def get_pie(par1='', par2='', par3='', par4=''):
+
+    if par1 == 'api':
+        url = 'http://api.frankly.me' + '/' + par2 + '/' + par3 + '/' + par4 + '/'
+    else:
+        url = 'http://frankly.me' + '/' + par2 + '/' + par3 + '/' + par4 + '/'
     url = url.strip('/')
     cur.execute(
         'SELECT status, count FROM %s WHERE DATE_TIME BETWEEN "%s" AND "%s" AND url="%s"' % 
@@ -102,16 +138,19 @@ def get_pie(par1='', par2='', par3=''):
 @app.route('/get/<par1>/')
 @app.route('/get/<par1>/<par2>/')
 @app.route('/get/<par1>/<par2>/<par3>/')
-def get_line(par1='', par2='', par3=''):
-
-    url = 'http://api.frankly.me' + '/' + par1 + '/' + par2 + '/' + par3 + '/'
+@app.route('/get/<par1>/<par2>/<par3>/<par4>/')
+def get_line(par1='', par2='', par3='', par4=''):
+    if par1 == 'api':
+        url = 'http://api.frankly.me' + '/' + par2 + '/' + par3 + '/' + par4 + '/'
+    else:
+        url = 'http://frankly.me' + '/' + par2 + '/' + par3 + '/' + par4 + '/'
     url = url.strip('/')
-
+    print url
     try:
         data = []
         for status in config.STATUS:
             cur.execute(
-                'SELECT date_time, response_time FROM %s WHERE status=%s AND url="%s" AND DATE_TIME BETWEEN "%s" AND "%s" ORDER BY date_time DESC LIMIT 10' % 
+                'SELECT date_time, response_time, count FROM %s WHERE status=%s AND url="%s" AND DATE_TIME BETWEEN "%s" AND "%s" ORDER BY date_time DESC LIMIT 10' % 
                 (config.TABLE_RESPONSE , status, url, config.T1, config.T2)
                 )
             data.append(cur.fetchall())
@@ -124,8 +163,9 @@ def get_line(par1='', par2='', par3=''):
     x_value_formatter=lambda dt: dt.strftime('%H:%M'), 
     dots_size=5, legend_box_size=15, label_font_size=34, 
     style=CleanStyle, fill=True, x_title='Time')
-
     timeline.title = 'API Performance'
+
+    data = [tuple(map(lambda x: (x[0], x[1]/x[-1]), dt)) for dt in data]
 
     for l in range(len(config.STATUS)):
         timeline.add(config.STATUS[l], data[l])

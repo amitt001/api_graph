@@ -2,8 +2,6 @@
 
 import sys
 import json
-import time
-import pprint
 import datetime
 from collections import defaultdict
 
@@ -13,8 +11,8 @@ from flask import Flask, jsonify
 import get_urls
 import config
 
-app = Flask(__name__ , static_url_path='')
 
+app = Flask(__name__ , static_url_path='')
 
 #Redis connection
 try:
@@ -32,14 +30,13 @@ def index():
 @app.route('/get/log/')
 def get_logs():
     fileBytePos = 0
-    data_count = 500
     response_by_minute = defaultdict(dict)
     response_by_minute_count = defaultdict(dict)
     response_count = defaultdict(dict)
     tmp_time  = 'null'
     #save file byte position in Redis if already exists get position
     while True:
-        inFile = open('./flask-timelog.txt','r')
+        inFile = open(config.LOG_FILE,'r')
         if not r.hget(config.REDIS_HNAME, 'fileBytePos'):
             r.hset(config.REDIS_HNAME, 'fileBytePos', fileBytePos)
         fileBytePos = int(r.hget(config.REDIS_HNAME, 'fileBytePos'))
@@ -69,8 +66,6 @@ def get_logs():
         fileBytePos = inFile.tell()
         r.hset(config.REDIS_HNAME, 'fileBytePos', fileBytePos)
         inFile.close()
-
-        data_count -= 1
 
     return jsonify({'log_by_min': response_by_minute, 'log_by_count': response_by_minute_count}), 200
 

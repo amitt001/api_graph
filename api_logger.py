@@ -45,10 +45,20 @@ tmp_count = 0
 
 if __name__ == '__main__':
     while True:
-        
-        rsp = requests.get(config.URL)
-        response_by_minute = rsp.json()['log_by_min']
-        response_by_minute_count = rsp.json()['log_by_count']
+        try:
+            rsp = requests.get(config.URL)
+        except requests.exceptions.ConnectionError:
+            print('Run log API on the log server to get data.')
+            time.sleep(3)
+            print('Retrying...')
+            continue
+        try:
+            response_by_minute = rsp.json()['log_by_min']
+            response_by_minute_count = rsp.json()['log_by_count']
+        except:
+            print('Invalid Data(either no log file exists or data returned is not json).\nExiting...')
+            time.sleep(1)
+            sys.exit(1)
 
         for date_time in response_by_minute.keys():
             for rsp in response_by_minute[date_time].keys():
